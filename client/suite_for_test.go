@@ -34,44 +34,6 @@ const (
 			],
 			"joint_account": false,
 			"secondary_identification": "A1B2C3D4",
-			"private_identification": {
-				"birth_date": "2017-07-23",
-				"birth_country": "GB",
-				"identification": "13YH458762",
-				"address": [
-					"10 Avenue des Champs"
-				],
-				"city": "London",
-				"country": "GB",
-				"title": "Mrs",
-				"first_name": "Jane",
-				"last_name": "Doe",
-				"document_number": "123456789"
-			},
-			"organisation_identification": {
-				"identification": "123654",
-				"actors": [
-					{
-						"name": [
-							"Jeff Page"
-						],
-						"birth_date": "1970-01-01",
-						"residency": "GB"
-					}
-				],
-				"address": [
-					"10 Avenue des Champs"
-				],
-				"city": "London",
-				"country": "GB",
-				"name": "Jane Doe Ltd",
-				"registration_number": "123456789",
-				"representative": {
-					"name": "John Smith",
-					"birth_date": "1970-01-01",
-					"residency": "GB"
-				}
-			},
 			"status": "confirmed",
 			"status_reason": "unspecified",
 			"user_defined_data": [
@@ -83,28 +45,6 @@ const (
 			"validation_type": "card",
 			"reference_mask": "############",
 			"acceptance_qualifier": "same_day",
-			"relationships": {
-				"master_account": {
-					"data": [
-						{
-							"type": "accounts",
-							"id": "a52d13a4-f435-4c00-cfad-f5e7ac5972df"
-						}
-					]
-				},
-				"account_events": {
-					"data": [
-						{
-							"type": "account_events",
-							"id": "c1023677-70ee-417a-9a6a-e211241f1e9c"
-						},
-						{
-							"type": "account_events",
-							"id": "437284fa-62a6-4f1d-893d-2959c9780288"
-						}
-					]
-				}
-			},
 			"title": "Mrs",
 			"first_name": "Jane",
 			"bank_account_name": "Jane Doe",
@@ -160,4 +100,10 @@ func ptrAccountStatus(s accounts.AccountStatus) *accounts.AccountStatus {
 
 func ptrTime(t time.Time) *time.Time {
 	return &t
+}
+
+type errReader int
+
+func (errReader) Read(p []byte) (n int, err error) {
+	return 0, fmt.Errorf("failed to read")
 }

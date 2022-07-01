@@ -50,7 +50,7 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 
 	afterTest := time.Now()
 
-	// quick check to see that CreatedOn and ModifiedOn are in valid time ranges
+	// quick check to see that CreatedOn and ModifiedOn times fall in valid time ranges
 	assert.True(t, resp.Data.CreatedOn.After(beforeTest) && resp.Data.CreatedOn.Before(afterTest))
 	assert.True(t, resp.Data.ModifiedOn.After(beforeTest) && resp.Data.ModifiedOn.Before(afterTest))
 
@@ -64,9 +64,110 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 	expectedResp.Data.CreatedOn = ptrTime(getDummyTime())
 	expectedResp.Data.ModifiedOn = ptrTime(getDummyTime())
 
-	// fix the time values in the response to match the dummy value
+	// overwrite the time values in the response to match the dummy value
 	resp.Data.CreatedOn = ptrTime(getDummyTime())
 	resp.Data.ModifiedOn = ptrTime(getDummyTime())
 
 	assert.Equal(t, expectedResp, resp)
+}
+
+// TestCreateAccountWithExistingID_FailurePath checks for expected errors when creating an account with an ID that already exists
+func TestCreateAccountWithExistingID_FailurePath(t *testing.T) {
+	c := client.NewClient(testBaseURL, nil)
+
+	accountID, err := uuid.NewRandom()
+	assert.NoError(t, err)
+
+	account := &accounts.AccountData{
+		ID:             accountID.String(),
+		OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
+		Type:           "accounts",
+		Attributes: &accounts.AccountAttributes{
+			Country: ptrStr("GB"),
+			Name:    []string{"Jane Doe"},
+		},
+	}
+
+	req := accounts.NewCreateRequest(account)
+
+	resp1, err := c.Create(context.Background(), req)
+	assert.NoError(t, err)
+	assert.NotNil(t, resp1)
+
+	// we know the previous account created successfully, now let's try to recreate it and hope it fails
+	resp2, err := c.Create(context.Background(), req)
+	assert.Error(t, err)
+	assert.Nil(t, resp2)
+
+	// check the error message
+	assert.Equal(t, "api error - failed to create account, status code: 409: Account cannot be created as it violates a duplicate constraint", err.Error())
+}
+
+// TestCreateAccountWithMissingRequiredFields_FailurePath checks for expected errors when required fields are omitted
+func TestCreateAccountWithMissingRequiredFields_FailurePath(t *testing.T) {
+	const missingDataErrorMsgFormatNest3 = "api error - failed to create account, status code: 400: validation failure list:\nvalidation failure list:\nvalidation failure list:\n%s in body is required"
+	const missingDataErrorMsgFormatNest2 = "api error - failed to create account, status code: 400: validation failure list:\nvalidation failure list:\n%s in body is required"
+
+	c := client.NewClient(testBaseURL, nil)
+
+	testCases := []struct {
+		name             string
+		accountData      *accounts.AccountData
+		expectedErrorMsg string
+	}{
+		{
+			name: "missing country",
+			accountData: &accounts.AccountData{
+				OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
+				Type:           "accounts",
+				Attributes:     &accounts.AccountAttributes{Name: []string{"Jane Doe"}},
+			},
+			expectedErrorMsg: fmt.Sprintf(missingDataErrorMsgFormatNest3, "country"),
+		},
+		{
+			name: "missing name",
+			accountData: &accounts.AccountData{
+				OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
+				Type:           "accounts",
+				Attributes:     &accounts.AccountAttributes{Country: ptrStr("GB")},
+			},
+			expectedErrorMsg: fmt.Sprintf(missingDataErrorMsgFormatNest3, "name"),
+		},
+		{
+			name: "missing organisation ID",
+			accountData: &accounts.AccountData{
+				Type: "accounts",
+				Attributes: &accounts.AccountAttributes{
+					Country: ptrStr("GB"),
+					Name:    []string{"Jane Doe"},
+				},
+			},
+			expectedErrorMsg: fmt.Sprintf(missingDataErrorMsgFormatNest2, "organisation_id"),
+		},
+		{
+			name: "missing type",
+			accountData: &accounts.AccountData{
+				OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
+				Attributes:     &accounts.AccountAttributes{Country: ptrStr("GB"), Name: []string{"Jane Doe"}},
+			},
+			expectedErrorMsg: fmt.Sprintf(missingDataErrorMsgFormatNest2, "type"),
+		},
+	}
+
+	for idx, tc := range testCases {
+		t.Run(fmt.Sprintf("test case %d: %s", idx+1, tc.name), func(t *testing.T) {
+			accountID, err := uuid.NewRandom()
+			assert.NoError(t, err)
+
+			tc.accountData.ID = accountID.String()
+
+			req := accounts.NewCreateRequest(tc.accountData)
+			resp, err := c.Create(context.Background(), req)
+			assert.Error(t, err)
+			assert.Nil(t, resp)
+
+			// check the error message
+			assert.Equal(t, tc.expectedErrorMsg, err.Error())
+		})
+	}
 }
