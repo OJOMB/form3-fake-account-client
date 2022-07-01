@@ -30,7 +30,7 @@ func NewAccountStatus(s string) (AccountStatus, error) {
 	case accountStatusFailedStr:
 		return AccountStatusFailed, nil
 	default:
-		return 0, fmt.Errorf("invalid account status: %s", s)
+		return -1, fmt.Errorf("invalid account status: %s", s)
 	}
 }
 

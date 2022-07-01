@@ -47,7 +47,7 @@ func TestCreateReturn201WithValidRespBody_SuccessPath(t *testing.T) {
 		ID:             "1dfaf917-c6d6-4e18-b7e7-972e66492976",
 		OrganisationID: "caca9817-6936-4da4-96e7-9ce93206070f",
 		Attributes: &accounts.AccountAttributes{
-			AccountClassification:   ptrStr("Personal"),
+			AccountClassification:   accounts.AccountClassificationPersonal,
 			AccountNumber:           "10000004",
 			BankID:                  "400302",
 			BankIDCode:              "GBDSC",
@@ -57,7 +57,7 @@ func TestCreateReturn201WithValidRespBody_SuccessPath(t *testing.T) {
 			CustomerID:              "12345",
 			Iban:                    "GB28NWBK40030212764204",
 			Name:                    []string{"Jane Doe"},
-			NameMatchingStatus:      "opted_out",
+			NameMatchingStatus:      accounts.AccountNameMatchingStatusOptedOut,
 			AlternativeNames:        []string{"Sam Holder"},
 			JointAccount:            ptrBool(false),
 			SecondaryIdentification: "A1B2C3D4",

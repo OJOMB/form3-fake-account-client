@@ -16,26 +16,26 @@ type AccountData struct {
 }
 
 type AccountAttributes struct {
-	AcceptanceQualifier     string            `json:"acceptance_qualifier,omitempty"`
-	AccountClassification   *string           `json:"account_classification,omitempty"`
-	AccountNumber           string            `json:"account_number,omitempty"`
-	AlternativeNames        []string          `json:"alternative_names,omitempty"`
-	BankID                  string            `json:"bank_id,omitempty"`
-	BankIDCode              string            `json:"bank_id_code,omitempty"`
-	BaseCurrency            string            `json:"base_currency,omitempty"`
-	Bic                     string            `json:"bic,omitempty"`
-	Country                 *string           `json:"country,omitempty"`
-	CustomerID              string            `json:"customer_id,omitempty"`
-	Iban                    string            `json:"iban,omitempty"`
-	JointAccount            *bool             `json:"joint_account,omitempty"`
-	Name                    []string          `json:"name,omitempty"`
-	NameMatchingStatus      string            `json:"name_matching_status,omitempty"`
-	ReferenceMask           string            `json:"reference_mask,omitempty"`
-	SecondaryIdentification string            `json:"secondary_identification,omitempty"`
-	Status                  *AccountStatus    `json:"status,omitempty"`
-	StatusReason            string            `json:"status_reason,omitempty"`
-	UserDefinedData         []UserDefinedData `json:"user_defined_data,omitempty"`
-	ValidationType          string            `json:"validation_type,omitempty"`
+	AcceptanceQualifier     string                    `json:"acceptance_qualifier,omitempty"`
+	AccountClassification   AccountClassification     `json:"account_classification,omitempty"`
+	AccountNumber           string                    `json:"account_number,omitempty"`
+	AlternativeNames        []string                  `json:"alternative_names,omitempty"`
+	BankID                  string                    `json:"bank_id,omitempty"`
+	BankIDCode              string                    `json:"bank_id_code,omitempty"`
+	BaseCurrency            string                    `json:"base_currency,omitempty"`
+	Bic                     string                    `json:"bic,omitempty"`
+	Country                 *string                   `json:"country,omitempty"`
+	CustomerID              string                    `json:"customer_id,omitempty"`
+	Iban                    string                    `json:"iban,omitempty"`
+	JointAccount            *bool                     `json:"joint_account,omitempty"`
+	Name                    []string                  `json:"name,omitempty"`
+	NameMatchingStatus      AccountNameMatchingStatus `json:"name_matching_status,omitempty"`
+	ReferenceMask           string                    `json:"reference_mask,omitempty"`
+	SecondaryIdentification string                    `json:"secondary_identification,omitempty"`
+	Status                  *AccountStatus            `json:"status,omitempty"`
+	StatusReason            string                    `json:"status_reason,omitempty"`
+	UserDefinedData         []UserDefinedData         `json:"user_defined_data,omitempty"`
+	ValidationType          string                    `json:"validation_type,omitempty"`
 	// Deprecated: AlternativeBankAccountNames is deprecated
 	AlternativeBankAccountNames []string `json:"alternative_bank_account_names,omitempty"`
 	// Deprecated: BankAccountName is deprecated

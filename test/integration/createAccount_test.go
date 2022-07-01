@@ -23,7 +23,7 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 		OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
 		Type:           "accounts",
 		Attributes: &accounts.AccountAttributes{
-			AccountClassification:   ptrStr("Personal"),
+			AccountClassification:   accounts.AccountClassificationPersonal,
 			AccountMatchingOptOut:   false,
 			AccountNumber:           "10000004",
 			AlternativeNames:        []string{"Sam Holder"},
