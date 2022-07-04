@@ -102,6 +102,7 @@ func ptrTime(t time.Time) *time.Time {
 	return &t
 }
 
+// errReader is intended to help us test - mainly in the corner case of error handling in the case of defective response bodies
 type errReader int
 
 func (errReader) Read(p []byte) (n int, err error) {
