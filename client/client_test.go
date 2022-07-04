@@ -56,7 +56,9 @@ func TestClient_AddsRequiredHeaders(t *testing.T) {
 	// check GET request has expected headers
 	req, err := http.NewRequest(http.MethodGet, "http://localhost:1234/this/is/a/fake", nil)
 	assert.NoError(t, err)
-	c.httpClient.Do(req)
+
+	_, err = c.httpClient.Do(req)
+	assert.NoError(t, err)
 
 	// check POST request has expected headers including those only required for requests with body
 	req, err = http.NewRequest(
@@ -65,7 +67,10 @@ func TestClient_AddsRequiredHeaders(t *testing.T) {
 		ioutil.NopCloser(bytes.NewBufferString("this request has a body")),
 	)
 	assert.NoError(t, err)
-	c.httpClient.Do(req)
+
+	_, err = c.httpClient.Do(req)
+	assert.NoError(t, err)
+
 }
 
 // the following testing could also be done with the mocked roundtripper but I thought I would throw this in
@@ -77,7 +82,8 @@ func TestClientget_checkRequestArrivesAndReturnsExpectedResponse(t *testing.T) {
 		assert.Equal(t, "/this/is/a/fake", r.URL.String())
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"this": "is the response"}`))
+		_, err := w.Write([]byte(`{"this": "is the response"}`))
+		assert.NoError(t, err)
 	}))
 
 	defer server.Close()
@@ -104,7 +110,8 @@ func TestClientpost_checkRequestArrivesAndReturnsExpectedResponse(t *testing.T) 
 		assert.Equal(t, `{"this": "is the request"}`, string(reqBody))
 
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"this": "is the response"}`))
+		_, err = w.Write([]byte(`{"this": "is the response"}`))
+		assert.NoError(t, err)
 	}))
 
 	defer server.Close()
