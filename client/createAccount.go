@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,25 +10,20 @@ import (
 	"github.com/OJOMB/form3-fake-account-client/accounts"
 )
 
-// Create creates a new account
+// Create attempts to create a new account
 // https://api-docs.form3.tech/api.html#organisation-accounts-create
-func (c *Client) Create(ctx context.Context, req *accounts.RequestCreateAccount) (*accounts.ResponseCreateAccount, error) {
+func (c *Client) Create(ctx context.Context, account accounts.AccountData) (*accounts.Response, error) {
+	// create request
+	req := accounts.NewRequest(account)
 	reqBody, err := json.Marshal(req)
 	if err != nil {
-		// return nil, fmt.Errorf("internal error - failed to marshal input request: %v", err)
 		return nil, newInternalError("failed to marshal input request", err)
 	}
 
-	// Create a new POST request to the accounts endpoint
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s%s", c.baseURL, basev1AccountsPath), bytes.NewBuffer(reqBody))
-	if err != nil {
-		return nil, newInternalError("failed to create http request", err)
-	}
-
 	// send request
-	resp, err := c.Do(httpReq)
+	resp, err := c.post(ctx, basev1AccountsPath, reqBody)
 	if err != nil {
-		return nil, newInternalError("failed to send http request", err)
+		return nil, err
 	}
 
 	// read response
@@ -47,11 +41,11 @@ func (c *Client) Create(ctx context.Context, req *accounts.RequestCreateAccount)
 			return nil, newInternalError("failed to unmarshal response body", err)
 		}
 
-		return nil, newApiError(fmt.Sprintf("failed to create account, status code: %d", resp.StatusCode), apiError)
+		return nil, newApiError(fmt.Sprintf("failed to create account, status code %d", resp.StatusCode), apiError)
 	}
 
 	// handle success response
-	var createdAccountResp accounts.ResponseCreateAccount
+	var createdAccountResp accounts.Response
 	if err := json.Unmarshal(respBody, &createdAccountResp); err != nil {
 		return nil, newInternalError("failed to unmarshal response body", err)
 	}

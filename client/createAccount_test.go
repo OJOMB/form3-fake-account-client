@@ -13,13 +13,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestCreateReturn201WithValidRespBody_SuccessPath tests the happy path of the Create function by simulating
+// TestCreate_return201WithValidRespBody_SuccessPath tests the happy path of the Create function by simulating
 // a successful response from the API
 // All fields including deprecated fields are returned to the client and checked for in the client response
-func TestCreateReturn201WithValidRespBody_SuccessPath(t *testing.T) {
+func TestCreate_return201WithValidRespBody_SuccessPath(t *testing.T) {
 	// mock roundtripper will return a response with all fields including deprecated
 	// this is of course unfaithful to the actual API because of server-side validations that would result in this never happening
-	// despite this it serves to allow us to test the clients ability to accurately gather all fields
+	// despite this doing it this way still serves to allow us to test the clients ability to accurately gather all fields in the response
 	respBody := fmt.Sprintf(
 		`{
 			"data": %s,
@@ -83,13 +83,11 @@ func TestCreateReturn201WithValidRespBody_SuccessPath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(&account)
-
-	resp, err := client.Create(context.Background(), req)
+	resp, err := client.Create(context.Background(), account)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	expectedresp := &accounts.ResponseCreateAccount{
+	expectedresp := &accounts.Response{
 		Data: &account,
 		Links: &accounts.Links{
 			Self: fmt.Sprintf("%s/1dfaf917-c6d6-4e18-b7e7-972e66492976", basev1AccountsPath),
@@ -102,7 +100,7 @@ func TestCreateReturn201WithValidRespBody_SuccessPath(t *testing.T) {
 	assert.EqualValues(t, expectedresp, resp)
 }
 
-func TestCreateReturn201WithInvalidJsonRespBody_FailurePath(t *testing.T) {
+func TestCreate_return201WithInvalidJsonRespBody_FailurePath(t *testing.T) {
 	respBody := fmt.Sprintf(
 		`{
 			"data": %s,
@@ -135,16 +133,14 @@ func TestCreateReturn201WithInvalidJsonRespBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(&account)
-
-	resp, err := client.Create(context.Background(), req)
+	resp, err := client.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
 	assert.Equal(t, `internal error - failed to unmarshal response body: invalid character '\n' in string literal`, err.Error())
 }
 
-func TestCreateReturnUnreadableBody_FailurePath(t *testing.T) {
+func TestCreate_returnUnreadableBody_FailurePath(t *testing.T) {
 	// roundtripper returns erroneous response
 	mrt := &mockRoundTripper{
 		transportFunc: func(req *http.Request) (*http.Response, error) {
@@ -169,16 +165,14 @@ func TestCreateReturnUnreadableBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(&account)
-
-	resp, err := client.Create(context.Background(), req)
+	resp, err := client.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
 	assert.Equal(t, "internal error - failed to read response body: failed to read", err.Error())
 }
 
-func TestCreateFailedSend_FailurePath(t *testing.T) {
+func TestCreate_failedRequestSend_FailurePath(t *testing.T) {
 	// roundtripper returns erroneous response
 	mrt := &mockRoundTripper{
 		transportFunc: func(req *http.Request) (*http.Response, error) {
@@ -198,16 +192,14 @@ func TestCreateFailedSend_FailurePath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(&account)
-
-	resp, err := client.Create(context.Background(), req)
+	resp, err := client.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
 	assert.Equal(t, `internal error - failed to send http request: Post "http://localhost:8080/v1/organisation/accounts": nope`, err.Error())
 }
 
-func TestCreateNon201_FailurePath(t *testing.T) {
+func TestCreate_returnNon201_FailurePath(t *testing.T) {
 	respBody := `{"error_message": "internal server error"}`
 
 	// roundtripper returns 500 error response with above body
@@ -231,16 +223,14 @@ func TestCreateNon201_FailurePath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(&account)
-
-	resp, err := client.Create(context.Background(), req)
+	resp, err := client.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
-	assert.Equal(t, "api error - failed to create account, status code: 500: internal server error", err.Error())
+	assert.Equal(t, "api error - failed to create account, status code 500: internal server error", err.Error())
 }
 
-func TestCreateNon201ResponseWithInvalidJson_FailurePath(t *testing.T) {
+func TestCreate_returnNon201ResponseWithInvalidJson_FailurePath(t *testing.T) {
 	respBody := `{"error_message": "this is invalid json}`
 
 	// roundtripper returns 500 error response with above body
@@ -264,9 +254,7 @@ func TestCreateNon201ResponseWithInvalidJson_FailurePath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(&account)
-
-	resp, err := client.Create(context.Background(), req)
+	resp, err := client.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 

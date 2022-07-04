@@ -1,11 +1,11 @@
 package accounts
 
 type (
-	RequestCreateAccount struct {
+	Request struct {
 		Data *AccountData `json:"data"`
 	}
 
-	ResponseCreateAccount struct {
+	Response struct {
 		Data  *AccountData `json:"data"`
 		Links *Links       `json:"links"`
 	}
@@ -15,8 +15,6 @@ type (
 	}
 )
 
-func NewCreateRequest(data *AccountData) *RequestCreateAccount {
-	return &RequestCreateAccount{
-		Data: data,
-	}
+func NewRequest(data AccountData) *Request {
+	return &Request{Data: &data}
 }
