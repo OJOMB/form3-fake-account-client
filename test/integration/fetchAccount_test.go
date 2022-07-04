@@ -12,7 +12,8 @@ import (
 )
 
 func TestFetchAccount_SuccessPath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
@@ -69,7 +70,8 @@ func TestFetchAccount_SuccessPath(t *testing.T) {
 }
 
 func TestFetchAccount_NonExistentAccount_FailurePath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	// liklehood of collision essentially zero so just use random uuid
 	accountID, err := uuid.NewRandom()
@@ -85,7 +87,8 @@ func TestFetchAccount_NonExistentAccount_FailurePath(t *testing.T) {
 }
 
 func TestFetchAccount_WithInvalidUUID_FailurePath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID := "not-a-uuid"
 	fetchResp, err := c.Fetch(context.Background(), accountID)

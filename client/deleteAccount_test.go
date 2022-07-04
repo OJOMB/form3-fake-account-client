@@ -18,8 +18,10 @@ func TestDelete_return204_SuccessPath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
-	err := client.Delete(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976", 0)
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
+
+	err = c.Delete(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976", 0)
 	assert.NoError(t, err)
 }
 
@@ -70,8 +72,10 @@ func TestDelete_returnNon204_FailurePath(t *testing.T) {
 				},
 			}
 
-			client := NewClient("http://localhost:8080", mrt)
-			err := client.Delete(context.Background(), tc.accountID, 0)
+			c, err := NewClient("http://0.0.0.0:8080", mrt)
+			assert.NoError(t, err)
+
+			err = c.Delete(context.Background(), tc.accountID, 0)
 			assert.Equal(t, tc.expectedErr, err.Error())
 		})
 	}
@@ -87,9 +91,10 @@ func TestDelete_returnNon204WithBadJSONinResponseBody(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
-	err := client.Delete(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976", 0)
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
 
+	err = c.Delete(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976", 0)
 	assert.Equal(t, "internal error - failed to unmarshal response body: unexpected end of JSON input", err.Error())
 }
 
@@ -106,15 +111,17 @@ func TestDelete_returnUnreadableBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
-	err := client.Delete(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976", 0)
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
 
+	err = c.Delete(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976", 0)
 	assert.Equal(t, "internal error - failed to read response body: failed to read", err.Error())
 }
 
 func TestDelete_EmptyAccountID_FailurePath(t *testing.T) {
-	client := NewClient("http://localhost:8080", nil)
-	err := client.Delete(context.Background(), "", 0)
+	c, err := NewClient("http://0.0.0.0:8080", nil)
+	assert.NoError(t, err)
 
+	err = c.Delete(context.Background(), "", 0)
 	assert.Equal(t, "input error - accountID cannot be empty", err.Error())
 }

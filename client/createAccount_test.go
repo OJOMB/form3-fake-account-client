@@ -40,7 +40,8 @@ func TestCreate_return201WithValidRespBody_SuccessPath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
+	c, err := NewClient("http://localhost:8080", mrt)
+	assert.NoError(t, err)
 
 	account := accounts.AccountData{
 		Type:           "accounts",
@@ -83,7 +84,7 @@ func TestCreate_return201WithValidRespBody_SuccessPath(t *testing.T) {
 		},
 	}
 
-	resp, err := client.Create(context.Background(), account)
+	resp, err := c.Create(context.Background(), account)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
@@ -121,7 +122,8 @@ func TestCreate_return201WithInvalidJsonRespBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
+	c, err := NewClient("http://localhost:8080", mrt)
+	assert.NoError(t, err)
 
 	account := accounts.AccountData{
 		Type:           "accounts",
@@ -133,7 +135,7 @@ func TestCreate_return201WithInvalidJsonRespBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	resp, err := client.Create(context.Background(), account)
+	resp, err := c.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -153,7 +155,8 @@ func TestCreate_returnUnreadableBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
+	c, err := NewClient("http://localhost:8080", mrt)
+	assert.NoError(t, err)
 
 	account := accounts.AccountData{
 		Type:           "accounts",
@@ -165,7 +168,7 @@ func TestCreate_returnUnreadableBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	resp, err := client.Create(context.Background(), account)
+	resp, err := c.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -180,7 +183,8 @@ func TestCreate_failedRequestSend_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
+	c, err := NewClient("http://localhost:8080", mrt)
+	assert.NoError(t, err)
 
 	account := accounts.AccountData{
 		Type:           "accounts",
@@ -192,7 +196,7 @@ func TestCreate_failedRequestSend_FailurePath(t *testing.T) {
 		},
 	}
 
-	resp, err := client.Create(context.Background(), account)
+	resp, err := c.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -211,7 +215,9 @@ func TestCreate_returnNon201_FailurePath(t *testing.T) {
 			}, nil
 		},
 	}
-	client := NewClient("http://localhost:8080", mrt)
+
+	c, err := NewClient("http://localhost:8080", mrt)
+	assert.NoError(t, err)
 
 	account := accounts.AccountData{
 		Type:           "accounts",
@@ -223,7 +229,7 @@ func TestCreate_returnNon201_FailurePath(t *testing.T) {
 		},
 	}
 
-	resp, err := client.Create(context.Background(), account)
+	resp, err := c.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -242,7 +248,9 @@ func TestCreate_returnNon201ResponseWithInvalidJson_FailurePath(t *testing.T) {
 			}, nil
 		},
 	}
-	client := NewClient("http://localhost:8080", mrt)
+
+	c, err := NewClient("http://localhost:8080", mrt)
+	assert.NoError(t, err)
 
 	account := accounts.AccountData{
 		Type:           "accounts",
@@ -254,7 +262,7 @@ func TestCreate_returnNon201ResponseWithInvalidJson_FailurePath(t *testing.T) {
 		},
 	}
 
-	resp, err := client.Create(context.Background(), account)
+	resp, err := c.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 

@@ -5,22 +5,26 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 const basev1AccountsPath = "/v1/organisation/accounts"
 
-type (
-	// Client functions to provide a programatic interface to the fake account API via it's methods
-	Client struct {
-		httpClient *http.Client
-		host       string
-	}
-)
+// Client functions to provide a programmatic interface to the fake account API via it's methods
+type Client struct {
+	httpClient *http.Client
+	host       string
+}
 
 // NewClient returns a pointer to a new instance of the fake account API client.
 // if transport == nil, we use http.DefaultTransport as RoundTripper
-func NewClient(host string, transport http.RoundTripper) *Client {
+func NewClient(host string, transport http.RoundTripper) (*Client, error) {
+	parsedURL, err := url.Parse(host)
+	if err != nil || parsedURL.Host == "" {
+		return nil, newInputError("invalid host", err)
+	}
+
 	if transport == nil {
 		transport = http.DefaultTransport
 	}
@@ -35,8 +39,8 @@ func NewClient(host string, transport http.RoundTripper) *Client {
 		httpClient: &http.Client{
 			Transport: transport,
 		},
-		host: host,
-	}
+		host: fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host),
+	}, nil
 }
 
 // requiredHeadersTransportDecorator is a custom RoundTripper that decorates the RoundTripper in its transport field

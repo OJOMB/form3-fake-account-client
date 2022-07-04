@@ -13,7 +13,8 @@ import (
 )
 
 func TestCreateAccount_SuccessPath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
@@ -71,7 +72,8 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 
 // TestCreateAccount_WithExistingID_FailurePath checks for expected errors when creating an account with an ID that already exists
 func TestCreateAccount_WithExistingID_FailurePath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
@@ -104,7 +106,8 @@ func TestCreateAccount_WithMissingRequiredFields_FailurePath(t *testing.T) {
 	const missingDataErrorMsgFormatNest3 = "api error - failed to create account, status code 400: validation failure list:\nvalidation failure list:\nvalidation failure list:\n%s in body is required"
 	const missingDataErrorMsgFormatNest2 = "api error - failed to create account, status code 400: validation failure list:\nvalidation failure list:\n%s in body is required"
 
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string

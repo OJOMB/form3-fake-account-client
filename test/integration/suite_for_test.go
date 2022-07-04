@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	testBaseURL = "http://localhost:8080"
+	testBaseURL = "http://0.0.0.0:8080"
 )
 
 func ptrStr(s string) *string {

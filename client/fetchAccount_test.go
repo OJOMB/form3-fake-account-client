@@ -40,8 +40,10 @@ func TestFetch_return200WithValidRespBody_SuccessPath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
-	resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
+
+	resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
@@ -113,9 +115,10 @@ func TestFetch_return200WithInvalidJsonRespBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
 
-	resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+	resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -135,8 +138,10 @@ func TestFetch_returnUnreadableBody_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
-	resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
+
+	resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -151,12 +156,14 @@ func TestFetch_FailedSend_FailurePath(t *testing.T) {
 		},
 	}
 
-	client := NewClient("http://localhost:8080", mrt)
-	resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
+
+	resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
-	assert.Equal(t, `internal error - failed to send http request: Get "http://localhost:8080/v1/organisation/accounts/1dfaf917-c6d6-4e18-b7e7-972e66492976": nope`, err.Error())
+	assert.Equal(t, `internal error - failed to send http request: Get "http://0.0.0.0:8080/v1/organisation/accounts/1dfaf917-c6d6-4e18-b7e7-972e66492976": nope`, err.Error())
 }
 
 func TestCreate_returnNon200_FailurePath(t *testing.T) {
@@ -193,8 +200,11 @@ func TestCreate_returnNon200_FailurePath(t *testing.T) {
 					}, nil
 				},
 			}
-			client := NewClient("http://localhost:8080", mrt)
-			resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+
+			c, err := NewClient("http://0.0.0.0:8080", mrt)
+			assert.NoError(t, err)
+
+			resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 			assert.Error(t, err)
 			assert.Nil(t, resp)
 
@@ -216,8 +226,11 @@ func TestFetch_returnNon200ResponseWithInvalidJson_FailurePath(t *testing.T) {
 			}, nil
 		},
 	}
-	client := NewClient("http://localhost:8080", mrt)
-	resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
+
+	resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -236,8 +249,11 @@ func TestFetch_return200ResponseWithInvalidJson_FailurePath(t *testing.T) {
 			}, nil
 		},
 	}
-	client := NewClient("http://localhost:8080", mrt)
-	resp, err := client.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
+
+	c, err := NewClient("http://0.0.0.0:8080", mrt)
+	assert.NoError(t, err)
+
+	resp, err := c.Fetch(context.Background(), "1dfaf917-c6d6-4e18-b7e7-972e66492976")
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
@@ -245,8 +261,10 @@ func TestFetch_return200ResponseWithInvalidJson_FailurePath(t *testing.T) {
 }
 
 func TestFetch_AccountWithEmptyID_FailurePath(t *testing.T) {
-	client := NewClient("http://localhost:8080", nil)
-	resp, err := client.Fetch(context.Background(), "")
+	c, err := NewClient("http://0.0.0.0:8080", nil)
+	assert.NoError(t, err)
+
+	resp, err := c.Fetch(context.Background(), "")
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 

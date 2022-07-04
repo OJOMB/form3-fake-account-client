@@ -13,7 +13,8 @@ import (
 // TestDeleteAccount_SuccessPath tests the success path of the DeleteAccount function
 // this is done by creatiung an account and then deleting it. Verifying that we get a successful response.
 func TestDeleteAccount_SuccessPath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
@@ -39,7 +40,8 @@ func TestDeleteAccount_SuccessPath(t *testing.T) {
 }
 
 func TestDeleteAccount_DeleteNonExistentAccount_Failure(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
@@ -50,7 +52,8 @@ func TestDeleteAccount_DeleteNonExistentAccount_Failure(t *testing.T) {
 }
 
 func TestDeleteAccount_IncorrectVersion_SuccessPath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
@@ -76,9 +79,10 @@ func TestDeleteAccount_IncorrectVersion_SuccessPath(t *testing.T) {
 }
 
 func TestDeleteAccount_InvalidUUID_SuccessPath(t *testing.T) {
-	c := client.NewClient(testBaseURL, nil)
+	c, err := client.NewClient(testBaseURL, nil)
+	assert.NoError(t, err)
 
 	// now we can attempt to delete an account with an invalid uuid
-	err := c.Delete(context.Background(), "invalid-uuid", 1)
+	err = c.Delete(context.Background(), "invalid-uuid", 1)
 	assert.Equal(t, "api error - failed to delete account, status code 400: id is not a valid uuid", err.Error())
 }
