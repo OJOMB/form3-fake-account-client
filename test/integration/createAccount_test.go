@@ -18,7 +18,7 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
 
-	account := &accounts.AccountData{
+	account := accounts.AccountData{
 		ID:             accountID.String(),
 		OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
 		Type:           "accounts",
@@ -41,11 +41,9 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(account)
-
 	beforeTest := time.Now()
 
-	resp, err := c.Create(context.Background(), req)
+	resp, err := c.Create(context.Background(), account)
 	assert.NoError(t, err)
 
 	afterTest := time.Now()
@@ -54,8 +52,8 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 	assert.True(t, resp.Data.CreatedOn.After(beforeTest) && resp.Data.CreatedOn.Before(afterTest))
 	assert.True(t, resp.Data.ModifiedOn.After(beforeTest) && resp.Data.ModifiedOn.Before(afterTest))
 
-	expectedResp := &accounts.ResponseCreateAccount{
-		Data: account,
+	expectedResp := &accounts.Response{
+		Data: &account,
 		Links: &accounts.Links{
 			Self: fmt.Sprintf("/v1/organisation/accounts/%s", accountID),
 		},
@@ -71,14 +69,14 @@ func TestCreateAccount_SuccessPath(t *testing.T) {
 	assert.Equal(t, expectedResp, resp)
 }
 
-// TestCreateAccountWithExistingID_FailurePath checks for expected errors when creating an account with an ID that already exists
-func TestCreateAccountWithExistingID_FailurePath(t *testing.T) {
+// TestCreateAccount_WithExistingID_FailurePath checks for expected errors when creating an account with an ID that already exists
+func TestCreateAccount_WithExistingID_FailurePath(t *testing.T) {
 	c := client.NewClient(testBaseURL, nil)
 
 	accountID, err := uuid.NewRandom()
 	assert.NoError(t, err)
 
-	account := &accounts.AccountData{
+	account := accounts.AccountData{
 		ID:             accountID.String(),
 		OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
 		Type:           "accounts",
@@ -88,36 +86,34 @@ func TestCreateAccountWithExistingID_FailurePath(t *testing.T) {
 		},
 	}
 
-	req := accounts.NewCreateRequest(account)
-
-	resp1, err := c.Create(context.Background(), req)
+	resp1, err := c.Create(context.Background(), account)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp1)
 
 	// we know the previous account created successfully, now let's try to recreate it and hope it fails
-	resp2, err := c.Create(context.Background(), req)
+	resp2, err := c.Create(context.Background(), account)
 	assert.Error(t, err)
 	assert.Nil(t, resp2)
 
 	// check the error message
-	assert.Equal(t, "api error - failed to create account, status code: 409: Account cannot be created as it violates a duplicate constraint", err.Error())
+	assert.Equal(t, "api error - failed to create account, status code 409: Account cannot be created as it violates a duplicate constraint", err.Error())
 }
 
-// TestCreateAccountWithMissingRequiredFields_FailurePath checks for expected errors when required fields are omitted
-func TestCreateAccountWithMissingRequiredFields_FailurePath(t *testing.T) {
-	const missingDataErrorMsgFormatNest3 = "api error - failed to create account, status code: 400: validation failure list:\nvalidation failure list:\nvalidation failure list:\n%s in body is required"
-	const missingDataErrorMsgFormatNest2 = "api error - failed to create account, status code: 400: validation failure list:\nvalidation failure list:\n%s in body is required"
+// TestCreateAccount_WithMissingRequiredFields_FailurePath checks for expected errors when required fields are omitted
+func TestCreateAccount_WithMissingRequiredFields_FailurePath(t *testing.T) {
+	const missingDataErrorMsgFormatNest3 = "api error - failed to create account, status code 400: validation failure list:\nvalidation failure list:\nvalidation failure list:\n%s in body is required"
+	const missingDataErrorMsgFormatNest2 = "api error - failed to create account, status code 400: validation failure list:\nvalidation failure list:\n%s in body is required"
 
 	c := client.NewClient(testBaseURL, nil)
 
 	testCases := []struct {
 		name             string
-		accountData      *accounts.AccountData
+		accountData      accounts.AccountData
 		expectedErrorMsg string
 	}{
 		{
 			name: "missing country",
-			accountData: &accounts.AccountData{
+			accountData: accounts.AccountData{
 				OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
 				Type:           "accounts",
 				Attributes:     &accounts.AccountAttributes{Name: []string{"Jane Doe"}},
@@ -126,7 +122,7 @@ func TestCreateAccountWithMissingRequiredFields_FailurePath(t *testing.T) {
 		},
 		{
 			name: "missing name",
-			accountData: &accounts.AccountData{
+			accountData: accounts.AccountData{
 				OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
 				Type:           "accounts",
 				Attributes:     &accounts.AccountAttributes{Country: ptrStr("GB")},
@@ -135,7 +131,7 @@ func TestCreateAccountWithMissingRequiredFields_FailurePath(t *testing.T) {
 		},
 		{
 			name: "missing organisation ID",
-			accountData: &accounts.AccountData{
+			accountData: accounts.AccountData{
 				Type: "accounts",
 				Attributes: &accounts.AccountAttributes{
 					Country: ptrStr("GB"),
@@ -146,7 +142,7 @@ func TestCreateAccountWithMissingRequiredFields_FailurePath(t *testing.T) {
 		},
 		{
 			name: "missing type",
-			accountData: &accounts.AccountData{
+			accountData: accounts.AccountData{
 				OrganisationID: "600b4bf3-4cae-4e1c-b382-968f86fc7489",
 				Attributes:     &accounts.AccountAttributes{Country: ptrStr("GB"), Name: []string{"Jane Doe"}},
 			},
@@ -161,8 +157,7 @@ func TestCreateAccountWithMissingRequiredFields_FailurePath(t *testing.T) {
 
 			tc.accountData.ID = accountID.String()
 
-			req := accounts.NewCreateRequest(tc.accountData)
-			resp, err := c.Create(context.Background(), req)
+			resp, err := c.Create(context.Background(), tc.accountData)
 			assert.Error(t, err)
 			assert.Nil(t, resp)
 
