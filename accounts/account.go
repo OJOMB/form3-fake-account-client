@@ -15,6 +15,7 @@ type AccountData struct {
 	ModifiedOn     *time.Time         `json:"modified_on,omitempty"`
 }
 
+// AccountAttributes holds the attributes of a Form3 account
 type AccountAttributes struct {
 	AcceptanceQualifier     string                    `json:"acceptance_qualifier,omitempty"`
 	AccountClassification   AccountClassification     `json:"account_classification,omitempty"`
@@ -36,6 +37,7 @@ type AccountAttributes struct {
 	StatusReason            string                    `json:"status_reason,omitempty"`
 	UserDefinedData         []UserDefinedData         `json:"user_defined_data,omitempty"`
 	ValidationType          string                    `json:"validation_type,omitempty"`
+
 	// Deprecated: AlternativeBankAccountNames is deprecated
 	AlternativeBankAccountNames []string `json:"alternative_bank_account_names,omitempty"`
 	// Deprecated: BankAccountName is deprecated

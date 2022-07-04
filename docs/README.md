@@ -1,0 +1,1 @@
+this dir is just included as a demonstration of how I generally structure Go Modules. If this were a real project /docs would be used to store documentation like how to deploy, how to contribute, architectural decision record etc.
